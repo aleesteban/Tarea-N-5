@@ -9,4 +9,202 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+**Pregunta 3**
+
+Suponga que el modelo poblacional es el siguiente: y = β0 + β1x1 + β2x2 + u
+Sin embargo, por ignorancia o falta de datos, se estima el modelo excluyendo x2, realizándose la siguiente regresión simple de y sólo sobre x1: y = β0 + β1x1 + v, donde v = β2x2 + u
+
+Pararesponder(a)y(b)asumax2 =0,8x1+e,dondex1 ∼N(20,1)ye∼N(0,1)
+
+**Letra A**
+
+*Calcule E(βˆ1) y var(βˆ1) para muestras de tamaños 50, 100, 500, 1000. ¿Existe sesgo?, ¿Desa-
+parece el sesgo a medida que el tamaño de la muestra aumenta?*
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+set.seed(123)
+
+reps = 10000
+
+betas = matrix(NA, nrow = reps, ncol = 8)
+
+beta0 = 2
+
+beta1 = 2.5
+
+beta2 = 1
+
+su = 1
+
+n = c(50, 100, 500, 1000)  #tamaño muestral
+
+for (j in 1:length(n)) {
+  
+  X1=rnorm(n[j],20,1)
+  
+  e=rnorm(n[j],0,1)
+  
+  X2=0.8*X1+e
+  
+  for (i in 1:reps) {
+    
+    u= rnorm(n[j],0,su)
+    
+    v = beta2*X2 + u
+    
+    Y_cs = beta0 + beta1*X1 + v
+    Y_ss = beta0 + beta1*X1 + beta2*X2 + u
+    
+    reg_cs = lm(Y_cs~X1)  
+    
+    betas[i,j] = reg_cs$coef[2]
+    
+    reg_ss = lm(Y_ss~X1+X2)
+    
+    betas[i,j+4] = reg_ss$coef[2]
+    
+    
+  }
+  
+}
+
+betas_df <- data.frame(betas)
+```
+
+*E(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
+
+```{r}
+apply(betas_df, 2, mean)
+```
+
+*Var(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
+
+```{r}
+apply(betas_df,2,var)
+```
+
+
+**Letra B**
+
+*Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
+
+```{r}
+library(ggplot2)
+
+library(gridExtra)
+
+library(dplyr)
+
+#Con sesgo
+g11 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,1], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,1]), sd=sd(betas_df[,1])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g21 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,2], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,2]), sd=sd(betas_df[,2])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g31 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,3], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,3]), sd=sd(betas_df[,3])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g41 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,4], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,4]), sd=sd(betas_df[,4])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+```
+
+
+```{r}
+#Sin sesgo
+g11 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,5], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,5]), sd=sd(betas_df[,5])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g21 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,6], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,6]), sd=sd(betas_df[,6])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g31 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,7], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,7]), sd=sd(betas_df[,7])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g41 <- ggplot(betas_df) + 
+  
+  geom_histogram(aes(betas_df[,8], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df[,8]), sd=sd(betas_df[,8])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+```
+
+
+**Letra C**
+
+*Si x2 ∼ U [0, 1], ¿Cómo cambian los resultados que obtuviste en (a) y (b)?*
+
+
 
