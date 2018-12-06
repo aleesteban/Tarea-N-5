@@ -172,4 +172,53 @@ grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
 
 #Letra C
 
+set.seed(123)
+
+reps = 10000
+
+betas = matrix(NA, nrow = reps, ncol = 8)
+
+beta0 = 2
+
+beta1 = 2.5
+
+beta2 = 1
+
+su = 1
+
+n = c(50, 100, 500, 1000)  #tamaño muestral
+
+for (j in 1:length(n)) {
+  
+  X1=rnorm(n[j],20,1)
+  
+  e=rnorm(n[j],0,1)
+  
+  X2=0.8*X1+e
+  
+  for (i in 1:reps) {
+    
+    u= rnorm(n[j],0,su)
+    
+    v = beta2*X2 + u
+    
+    Y_cs = beta0 + beta1*X1 + v
+    Y_ss = beta0 + beta1*X1 + beta2*X2 + u
+    
+    reg_cs = lm(Y_cs~X1)  
+    
+    betas[i,j] = reg_cs$coef[2]
+    
+    reg_ss = lm(Y_ss~X1+X2)
+    
+    betas[i,j+4] = reg_ss$coef[2]
+    
+    
+  }
+  
+}
+
+betas_df <- data.frame(betas)
+
+
 
