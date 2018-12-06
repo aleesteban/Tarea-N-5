@@ -30,16 +30,16 @@ for (j in 1:length(n)) {
     
     v = beta2*X2 + u
     
-    Y_cs = beta0 + beta1*X1 + v
-    Y_ss = beta0 + beta1*X1 + beta2*X2 + u
+    Y_omit = beta0 + beta1*X1 + v
+    Y_pob = beta0 + beta1*X1 + beta2*X2 + u
     
-    reg_cs = lm(Y_cs~X1)  
+    reg_omit = lm(Y_omit~X1)  
     
-    betas[i,j] = reg_cs$coef[2]
+    betas[i,j] = reg_omit$coef[2]
     
-    reg_ss = lm(Y_ss~X1+X2)
+    reg_pob = lm(Y_pob~X1+X2)
     
-    betas[i,j+4] = reg_ss$coef[2]
+    betas[i,j+4] = reg_pob$coef[2]
     
     
   }
@@ -192,9 +192,7 @@ for (j in 1:length(n)) {
   
   X1=rnorm(n[j],20,1)
   
-  e=rnorm(n[j],0,1)
-  
-  X2=0.8*X1+e
+  X2=runif(n[j],0,1)
   
   for (i in 1:reps) {
     
@@ -202,23 +200,23 @@ for (j in 1:length(n)) {
     
     v = beta2*X2 + u
     
-    Y_cs = beta0 + beta1*X1 + v
-    Y_ss = beta0 + beta1*X1 + beta2*X2 + u
+    Y_omit = beta0 + beta1*X1 + v
+    Y_pob = beta0 + beta1*X1 + beta2*X2 + u
     
-    reg_cs = lm(Y_cs~X1)  
+    reg_omit = lm(Y_omit~X1)  
     
-    betas[i,j] = reg_cs$coef[2]
+    betas2[i,j] = reg_omit$coef[2]
     
-    reg_ss = lm(Y_ss~X1+X2)
+    reg_pop = lm(Y_pop~X1+X2)
     
-    betas[i,j+4] = reg_ss$coef[2]
+    betas2[i,j+4] = reg_pop$coef[2]
     
     
   }
   
 }
 
-betas_df <- data.frame(betas)
+betas_df2 <- data.frame(betas2)
 
 
 
