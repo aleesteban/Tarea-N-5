@@ -205,11 +205,11 @@ for (j in 1:length(n)) {
     
     reg_omit = lm(Y_omit~X1)  
     
-    betas2[i,j] = reg_omit$coef[2]
+    betas[i,j] = reg_omit$coef[2]
     
     reg_pop = lm(Y_pop~X1+X2)
     
-    betas2[i,j+4] = reg_pop$coef[2]
+    betas[i,j+4] = reg_pop$coef[2]
     
     
   }
