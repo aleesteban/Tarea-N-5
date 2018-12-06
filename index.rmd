@@ -7,6 +7,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+
+library(gridExtra)
+
+library(dplyr)
 ```
 
 **Pregunta 3**
@@ -88,14 +93,9 @@ apply(betas_df,2,var)
 
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
 
+*modelo variable omitida*
 ```{r}
-library(ggplot2)
 
-library(gridExtra)
-
-library(dplyr)
-
-#Con sesgo
 g11 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,1], y=..density..), col="black", bins = 30) +
@@ -147,9 +147,9 @@ g41 <- ggplot(betas_df) +
 grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
 ```
 
-
+*modelo poblacional*
 ```{r}
-#Sin sesgo
+
 g11 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,5], y=..density..), col="black", bins = 30) +
@@ -227,9 +227,7 @@ for (j in 1:length(n)) {
   
   X1=rnorm(n[j],20,1)
   
-  e=rnorm(n[j],0,1)
-  
-  X2=0.8*X1+e
+  X2=runif(n[j],0,1)
   
   for (i in 1:reps) {
     
@@ -237,23 +235,148 @@ for (j in 1:length(n)) {
     
     v = beta2*X2 + u
     
-    Y_cs = beta0 + beta1*X1 + v
-    Y_ss = beta0 + beta1*X1 + beta2*X2 + u
+    Y_omit = beta0 + beta1*X1 + v
+    Y_pob = beta0 + beta1*X1 + beta2*X2 + u
     
-    reg_cs = lm(Y_cs~X1)  
+    reg_omit = lm(Y_omit~X1)  
     
-    betas[i,j] = reg_cs$coef[2]
+    betas[i,j] = reg_omit$coef[2]
     
-    reg_ss = lm(Y_ss~X1+X2)
+    reg_pob = lm(Y_pob~X1+X2)
     
-    betas[i,j+4] = reg_ss$coef[2]
+    betas[i,j+4] = reg_pob$coef[2]
     
     
   }
   
 }
 
-betas_df <- data.frame(betas)
+betas_df2 <- data.frame(betas)
 ```
 
+*E(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
+```{r}
+apply(betas_df2, 2, mean)
+```
+
+
+*Var(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
+```{r}
+apply(betas_df2,2,var)
+```
+
+*Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
+
+*Variable omitida*
+```{r}
+
+g11 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,1], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,1]), sd=sd(betas_df2[,1])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g21 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,2], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,2]), sd=sd(betas_df2[,2])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g31 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,3], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,3]), sd=sd(betas_df2[,3])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g41 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,4], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,4]), sd=sd(betas_df2[,4])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+
+
+
+
+
+```
+
+*modelo poblacional*
+```{r}
+
+g11 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,5], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,5]), sd=sd(betas_df2[,5])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g21 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,6], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,6]), sd=sd(betas_df2[,6])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g31 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,7], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,7]), sd=sd(betas_df2[,7])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+g41 <- ggplot(betas_df2) + 
+  
+  geom_histogram(aes(betas_df2[,8], y=..density..), col="black", bins = 30) +
+  
+  stat_function(fun=dnorm, args=list(mean=mean(betas_df2[,8]), sd=sd(betas_df2[,8])), 
+                
+                geom="line", colour="red", size=1) +
+  
+  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  
+  theme_bw()
+
+grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+```
 
