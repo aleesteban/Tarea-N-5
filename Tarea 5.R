@@ -1,3 +1,52 @@
+library(tidyverse)
+library(dplyr)
+library(tidyquant)
+library(ggplot2)
+library(ggthemes)
+
+#Pregunta 2 
+
+#Precios Microsoft
+stockprices <- c("MSFT")
+MSFT <- tq_get(stockprices,
+               get = "stock.prices",
+               from = "2000-01-01",
+               to = "2018-08-31",
+               periodicity = "monthly")
+
+#Precios Apple
+stockprices2 <- c("AAPL")
+AAPL <- tq_get(stockprices2,
+               get = "stock.prices",
+               from = "2000-01-01",
+               to = "2018-08-31",
+               periodicity = "monthly")
+#Pregunta 2A
+
+
+MS<- MSFT$close
+AP<- AAPL$close
+
+fx_ret <- function(x) {
+  a <- log(x)
+  b <- diff(a)
+  return(b)
+}
+
+retornosMS <- fx_ret(MS)
+retornosMS <- as.data.frame(retornosMS)  
+retornosAP <- fx_ret(AP)
+retornosAP <- as.data.frame(retornosAP) 
+
+#Letra B
+
+dia<- MSFT %>% select("date")
+colnames(dia) <- c("retornosMS")
+
+b <- merge(retornosMS,dia, no.dups = FALSE)
+
+ggplot(retornosMS, aes(x = date, y = close)) + geom_area()
+
 #Pregunta 3A
 
 set.seed(123)
