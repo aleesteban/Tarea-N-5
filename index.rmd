@@ -93,9 +93,9 @@ apply(betas_df,2,var)
 
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
 
-*modelo variable omitida*
-```{r}
 
+```{r}
+#Modelo con variable omitida
 g11 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,1], y=..density..), col="black", bins = 30) +
@@ -144,13 +144,11 @@ g41 <- ggplot(betas_df) +
   
   theme_bw()
 
-grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
-```
 
-*modelo poblacional*
-```{r}
 
-g11 <- ggplot(betas_df) + 
+#Modelo sin variable omitida
+
+g51 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,5], y=..density..), col="black", bins = 30) +
   
@@ -162,7 +160,7 @@ g11 <- ggplot(betas_df) +
   
   theme_bw()
 
-g21 <- ggplot(betas_df) + 
+g61 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,6], y=..density..), col="black", bins = 30) +
   
@@ -174,7 +172,7 @@ g21 <- ggplot(betas_df) +
   
   theme_bw()
 
-g31 <- ggplot(betas_df) + 
+g71 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,7], y=..density..), col="black", bins = 30) +
   
@@ -186,7 +184,7 @@ g31 <- ggplot(betas_df) +
   
   theme_bw()
 
-g41 <- ggplot(betas_df) + 
+g81 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,8], y=..density..), col="black", bins = 30) +
   
@@ -198,8 +196,10 @@ g41 <- ggplot(betas_df) +
   
   theme_bw()
 
-grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=2, ncol=4)
 ```
+
+
 
 
 **Letra C**
@@ -269,8 +269,8 @@ apply(betas_df2,2,var)
 
 *Variable omitida*
 ```{r}
-
-g11 <- ggplot(betas_df2) + 
+#Modelo con Variable omitida
+g12 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,1], y=..density..), col="black", bins = 30) +
   
@@ -282,7 +282,7 @@ g11 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g21 <- ggplot(betas_df2) + 
+g13 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,2], y=..density..), col="black", bins = 30) +
   
@@ -294,7 +294,7 @@ g21 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g31 <- ggplot(betas_df2) + 
+g14 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,3], y=..density..), col="black", bins = 30) +
   
@@ -306,7 +306,7 @@ g31 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g41 <- ggplot(betas_df2) + 
+g15 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,4], y=..density..), col="black", bins = 30) +
   
@@ -318,18 +318,10 @@ g41 <- ggplot(betas_df2) +
   
   theme_bw()
 
-grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
 
 
-
-
-
-```
-
-*modelo poblacional*
-```{r}
-
-g11 <- ggplot(betas_df2) + 
+#Modelo sin variable omitida
+g16 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,5], y=..density..), col="black", bins = 30) +
   
@@ -341,7 +333,7 @@ g11 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g21 <- ggplot(betas_df2) + 
+g17 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,6], y=..density..), col="black", bins = 30) +
   
@@ -353,7 +345,7 @@ g21 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g31 <- ggplot(betas_df2) + 
+g18 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,7], y=..density..), col="black", bins = 30) +
   
@@ -365,7 +357,7 @@ g31 <- ggplot(betas_df2) +
   
   theme_bw()
 
-g41 <- ggplot(betas_df2) + 
+g19 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,8], y=..density..), col="black", bins = 30) +
   
@@ -377,6 +369,11 @@ g41 <- ggplot(betas_df2) +
   
   theme_bw()
 
-grid.arrange(g11, g21, g31, g41, nrow=2, ncol=2)
+grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=2, ncol=4)
+
+
+
+
 ```
+
 
