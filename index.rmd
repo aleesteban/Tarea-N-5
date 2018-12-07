@@ -17,16 +17,16 @@ library(dplyr)
 **Pregunta 3**
 
 Suponga que el modelo poblacional es el siguiente: y = β0 + β1x1 + β2x2 + u
-Sin embargo, por ignorancia o falta de datos, se estima el modelo excluyendo x2, realizándose la siguiente regresión simple de y sólo sobre x1: y = β0 + β1x1 + v, donde v = β2x2 + u
 
-Pararesponder(a)y(b)asumax2 =0,8x1+e,dondex1 ∼N(20,1)ye∼N(0,1)
+Sin embargo, por ignorancia o falta de datos, se estima el modelo excluyendo x2, realizándose la siguiente regresión simple de y sólo sobre x1:    y = β0 + β1x1 + v, donde v = β2x2 + u
+
+Para responder (a) y (b) asuma x2 =0,8x1+e, dondex1 ∼N(20,1) y e∼N(0,1)
 
 **Letra A**
 
-*Calcule E(βˆ1) y var(βˆ1) para muestras de tamaños 50, 100, 500, 1000. ¿Existe sesgo?, ¿Desa-
-parece el sesgo a medida que el tamaño de la muestra aumenta?*
+*Calcule E(βˆ1) y var(βˆ1) para muestras de tamaños 50, 100, 500, 1000. ¿Existe sesgo?, ¿Desaparece el sesgo a medida que el tamaño de la muestra aumenta?*
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 set.seed(123)
 
 reps = 10000
@@ -78,15 +78,17 @@ betas_df <- data.frame(betas)
 
 *E(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
 
-```{r}
+```{r echo=FALSE}
 apply(betas_df, 2, mean)
 ```
 
 *Var(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
 
-```{r}
+```{r echo=FALSE}
 apply(betas_df,2,var)
 ```
+
+*RESPUESTA*
 
 
 **Letra B**
@@ -94,8 +96,8 @@ apply(betas_df,2,var)
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
 
 
-```{r}
-#Modelo con variable omitida
+```{r echo=FALSE}
+#Variable omitida
 g11 <- ggplot(betas_df) + 
   
   geom_histogram(aes(betas_df[,1], y=..density..), col="black", bins = 30) +
@@ -104,9 +106,9 @@ g11 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g21 <- ggplot(betas_df) + 
   
@@ -116,9 +118,9 @@ g21 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g31 <- ggplot(betas_df) + 
   
@@ -128,9 +130,9 @@ g31 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g41 <- ggplot(betas_df) + 
   
@@ -140,13 +142,13 @@ g41 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 
 
-#Modelo sin variable omitida
+#Sin variable omitida
 
 g51 <- ggplot(betas_df) + 
   
@@ -156,9 +158,9 @@ g51 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g61 <- ggplot(betas_df) + 
   
@@ -168,9 +170,9 @@ g61 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g71 <- ggplot(betas_df) + 
   
@@ -180,9 +182,9 @@ g71 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g81 <- ggplot(betas_df) + 
   
@@ -192,11 +194,11 @@ g81 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=2, ncol=4)
+grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=4, ncol=2)
 ```
 
 
@@ -206,7 +208,7 @@ grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=2, ncol=4)
 
 *Si x2 ∼ U [0, 1], ¿Cómo cambian los resultados que obtuviste en (a) y (b)?*
 
-```{r}
+```{r echo=FALSE}
 set.seed(123)
 
 reps = 10000
@@ -255,20 +257,22 @@ betas_df2 <- data.frame(betas)
 ```
 
 *E(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
-```{r}
+```{r echo=FALSE}
 apply(betas_df2, 2, mean)
 ```
 
 
 *Var(βˆ1) para muestras de tamaños 50, 100, 500, 1000*
-```{r}
+```{r echo=FALSE}
 apply(betas_df2,2,var)
 ```
 
+*RESPUESTA*
+
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
 
-*Variable omitida*
-```{r}
+
+```{r echo=FALSE}
 #Modelo con Variable omitida
 g12 <- ggplot(betas_df2) + 
   
@@ -278,9 +282,9 @@ g12 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g13 <- ggplot(betas_df2) + 
   
@@ -290,9 +294,9 @@ g13 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g14 <- ggplot(betas_df2) + 
   
@@ -302,9 +306,9 @@ g14 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 g15 <- ggplot(betas_df2) + 
   
@@ -314,13 +318,13 @@ g15 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
 
 
-#Modelo sin variable omitida
+#modelo sin variable omitida
 g16 <- ggplot(betas_df2) + 
   
   geom_histogram(aes(betas_df2[,5], y=..density..), col="black", bins = 30) +
@@ -331,7 +335,7 @@ g16 <- ggplot(betas_df2) +
   
   ylab("Densidad") +   ggtitle("n=50") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g17 <- ggplot(betas_df2) + 
   
@@ -343,7 +347,7 @@ g17 <- ggplot(betas_df2) +
   
   ylab("Densidad") +   ggtitle("n=100") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g18 <- ggplot(betas_df2) + 
   
@@ -355,7 +359,7 @@ g18 <- ggplot(betas_df2) +
   
   ylab("Densidad") +   ggtitle("n=500") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
 g19 <- ggplot(betas_df2) + 
   
@@ -367,10 +371,9 @@ g19 <- ggplot(betas_df2) +
   
   ylab("Densidad") +   ggtitle("n=1000") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=2, ncol=4)
-
+grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=4, ncol=2)
 
 
 
