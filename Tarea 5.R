@@ -176,7 +176,7 @@ g81 <- ggplot(betas_df) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=4, ncol=2)
+grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=2, ncol=4)
 
 
 #Letra C
@@ -334,4 +334,4 @@ g19 <- ggplot(betas_df2) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=4, ncol=2)
+grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=2, ncol=4)
