@@ -1,5 +1,5 @@
 ---
-title: "Tarea Nª5"
+title: "Tarea Nº5"
 author: "Alejandro Calderón - Macarena Riddle"
 date: "4/12/2018"
 output: html_document
@@ -8,11 +8,170 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
-
 library(gridExtra)
-
 library(dplyr)
+library(tidyverse)
+library(tidyquant)
+library(ggthemes)
+
+
 ```
+**Pregtuna 2**
+
+*Pregtuna 2.1*
+*Descargue el precio de las acciones de Microsoft (“MSFT”) y Apple (“AAPL”) desde Enero del 2000 hasta Agosto del 2018 con periodicidad mensual*
+```{r}
+
+MSFT_price <- tq_get("MSFT",
+                     get = "stock.prices",
+                     from = "1999-11-01",
+                     to = "2018-09-05",
+                     periodicity = "monthly")
+
+MSFT_quantmod <- getSymbols("MSFT",
+                            src = "yahoo",
+                            from = "1999-11-01",
+                            to = "2018-09-05",
+                            periodicity = "monthly")
+
+AAPL_price <- tq_get("AAPL",
+                     get = "stock.prices",
+                     from = "1999-11-01",
+                     to = "2018-09-05",
+                     periodicity = "monthly")
+
+AAPL_quantmod <- getSymbols("AAPL",
+                            src = "yahoo",
+                            from = "1999-11-01",
+                            to = "2018-09-05",
+                            periodicity = "monthly")
+
+MSFT_quantmod <- as.data.frame(MSFT) %>%
+  as.tibble() %>%
+  mutate(date = index(MSFT)) %>%
+  rename("open" = "MSFT.Open", "high" = "MSFT.High",
+         "low" = "MSFT.Low" , "close"= "MSFT.Close",
+         "volume" = "MSFT.Volume", "adjusted" = "MSFT.Adjusted")
+x <- length(MSFT_price$adjusted)
+
+AAPL_quantmod <- as.data.frame(AAPL) %>%
+  as.tibble() %>%
+  mutate(date = index(AAPL)) %>%
+  rename("open" = "AAPL.Open", "high" = "AAPL.High",
+         "low" = "AAPL.Low" , "close"= "AAPL.Close",
+         "volume" = "AAPL.Volume", "adjusted" = "AAPL.Adjusted")
+y <- length(AAPL_price$adjusted)
+
+```
+
+*Letra A*
+
+*Calcular los retornos*
+```{r}
+for (i in 1:x) {
+  MSFT_price[i+1,8] = log(MSFT_price[i+1,7] / MSFT_price[i,7])
+  if(i <= 2) {MSFT_price[i+1,9] = MSFT_price[i+1,8] + MSFT_price[i,8]}
+  else{MSFT_price[i+1,9] = MSFT_price[i,9] + MSFT_price[i+1,8]}
+  
+}
+
+for(i in 1:y){
+  AAPL_price[i+1,8] = log(AAPL_price[i+1,7]/AAPL_price[i,7])
+  if(i <= 2){AAPL_price[i+1,9] = AAPL_price[i+1,8] + AAPL_price[i,8]}
+  else{AAPL_price[i+1,9] = AAPL_price[i,9] + AAPL_price[i+1,8]}
+}
+
+MSFT_price = MSFT_price %>% rename(retornos_activos = "adjusted.1")
+MSFT_price = MSFT_price %>% rename(retornos_acum_activos = "adjusted.1.1")
+
+MSFT_retorno <- MSFT_price[3:226,]
+r1 <- length(MSFT_retorno$retornos_activos)
+sum(MSFT_retorno$retornos_activos)
+
+AAPL_price = AAPL_price %>% rename(retornos_activos = "adjusted.1")
+AAPL_price = AAPL_price %>% rename(retornos_acum_activos = "adjusted.1.1")
+
+AAPL_retorno <- AAPL_price[3:226,]
+r2 <- length(AAPL_price$retornos_activos)
+sum(AAPL_price$retornos_activos)
+```
+
+*Letra B*
+
+*Graficar los retornos y retornos acumulados*
+```{r}
+#Gráficos Microsoft
+
+ggplot(MSFT_retorno) + geom_line(aes(x=date, y=retornos_activos), color = "red") + 
+  labs(title = "Retorno mensual Microsoft", subtitle = "Desde Enero 2000 hasta Agosto 2018")+ 
+  theme_tq() + scale_color_tq()
+
+ggplot(MSFT_retorno) + geom_line(aes(x=date, y=retornos_acum_activos), color = "red") + 
+  labs(title = "Retorno Acumulado mensual Microsoft", subtitle = "Desde Enero 2000 hasta Agosto 2018")+ 
+  theme_tq() + scale_color_tq()
+
+#Gráficos Apple
+
+ggplot(AAPL_retorno) + geom_line(aes(x=date, y=retornos_activos), color = "red") + 
+  labs(title = "Retorno mensual Apple", subtitle = "Desde Enero 2000 hasta Agosto 2018")+ 
+  theme_tq() + scale_color_tq()
+
+ggplot(AAPL_retorno) + geom_line(aes(x=date, y=retornos_activos), color = "red") + 
+  labs(title = "Retorno Acumulado mensual Apple", subtitle = "Desde Enero 2000 hasta Agosto 2018")+ 
+  theme_tq() + scale_color_tq()
+```
+
+*Letra C*
+
+*Testear normalidad utilizando Jarque-Bera (JB)*
+
+*Test para Microsoft*
+```{r}
+m1 <- sum(MSFT_retorno$retornos_activos)/r1 
+m2 <- sum((MSFT_retorno$retornos_activos - m1)^2)  
+m3 <- sum((MSFT_retorno$retornos_activos - m1)^3)  
+m4 <- sum((MSFT_retorno$retornos_activos - m1)^4) 
+
+asim1 <- (m3/m2^(3/2))^2 #calculo coeficiente de  
+asim2 <- (m4/m2^2) 
+
+JB_MSFT <- r1*asim1/6+(asim2-3)^2/24 #Test Jarque-Bera
+
+
+chi_cuadrado_MSFT <- 1 - pchisq(JB_MSFT, df = 2) #Chi-cuadrado
+
+#H0: retornos presentan normalidad 
+#H1: retornos no presentan normalidad
+
+norm_MSFT = if(JB_MSFT > chi_cuadrado_MSFT){"Se rechaza la hipotesis nula"}else{"No se rechaza la hipotesis nula"}
+norm_MSFT
+
+
+
+```
+
+*Test para Apple*
+```{r}
+a1 <- sum(AAPL_retorno$retornos_activos)/r2 
+a2 <- sum((AAPL_retorno$retornos_activos - a1)^2) 
+a3 <- sum((AAPL_retorno$retornos_activos - a1)^3)  
+a4 <- sum((AAPL_retorno$retornos_activos - a1)^4) 
+
+asima1 <- (a3/a2^(3/2))^2 
+asima2 <- (a4/a2^2) 
+
+JB_AAPL <- r2*asima1/6+(asima2-3)^2/24
+
+chi_cuadrado_AAPL <- 1 - pchisq(JB_AAPL, df = 2)
+
+#H0: retornos presentan normalidad 
+#H1: retornos no presentan normalidad
+
+norm_AAPL= if(JB_AAPL > chi_cuadrado_AAPL){"Se rechaza la hipotesis nula"}else{"No se rechaza la hipotesis nula"}
+norm_AAPL
+```
+
+
 
 **Pregunta 3**
 
@@ -88,12 +247,18 @@ apply(betas_df, 2, mean)
 apply(betas_df,2,var)
 ```
 
-*RESPUESTA*
+*Existe sesgo en el modelo que omite la variable, ya que el valor esperado de β_1  está lejos del valor poblacional, lo que indica la presencia de sesgo. Esto se debe a que la variable X_2  (la cual está siendo omitida) tiene correlación con X_1,  provocando que el error se correlacione con la variable independiente del modelo y genere sesgo de inconsistencia, denominado sesgo de especificación.*
+*A medida que aumenta el tamaño de la muestra se puede notar que no desaparece el sesgo en el modelo que omite la variable, debido a que los valores de los estimadores oscilan indefinidamente aumentando y disminuyendo de manera intercalada. Por último, cabe destacar que la varianza va disminuyendo.*
+
 
 
 **Letra B**
 
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
+
+*Modelo V.O.R = Modelo con Variable Omitida Relevante*
+
+*Modelo Pob = Modelo Sin Variable Omitida*
 
 
 ```{r echo=FALSE}
@@ -106,9 +271,9 @@ g11 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo OVR (n=50)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v")
 
 g21 <- ggplot(betas_df) + 
   
@@ -118,9 +283,9 @@ g21 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo OVR (n=100)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v")
 
 g31 <- ggplot(betas_df) + 
   
@@ -130,9 +295,9 @@ g31 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo OVR (n=500)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v")
 
 g41 <- ggplot(betas_df) + 
   
@@ -142,9 +307,9 @@ g41 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo OVR (n=1000)") + xlab(expression(hat(beta)[1])) +
   
-  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
+  theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v")
 
 
 
@@ -158,7 +323,7 @@ g51 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=50)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -170,7 +335,7 @@ g61 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=100)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -182,7 +347,7 @@ g71 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=500)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -194,11 +359,11 @@ g81 <- ggplot(betas_df) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=1000)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=2, ncol=4)
+grid.arrange(g11, g21, g31, g41, g51, g61, g71, g81, nrow=3, ncol=3)
 ```
 
 
@@ -267,9 +432,17 @@ apply(betas_df2, 2, mean)
 apply(betas_df2,2,var)
 ```
 
-*RESPUESTA*
+*Ahora que X_2 se distribuye de manera uniforme entre [0,1] los valores esperados de los estimadores se acercan al valor poblacional, eliminado el sesgo en los dos modelos.*
+*Los betas por otro lado tienen una distribución normal y las varianzas de los estimadores disminuyen al aumentar el tamaño de la muestra.*
+*Por otro lado, el modelo que no omite la variable posee un valor esperado de β_1 cercano al parámetro poblacional (2,5), por lo que no posee sesgo.*
+
 
 *Grafique la distribución de βˆ1 para tamaños de muestra n = 50, 100, 500, 1000*
+
+*Modelo V.O = Modelo con Variable Omitida*
+
+*Modelo Pob = Modelo Sin Variable Omitida*
+
 
 
 ```{r echo=FALSE}
@@ -282,7 +455,7 @@ g12 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo V.O (n=50)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
@@ -294,7 +467,7 @@ g13 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo V.O (n=100)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
@@ -306,7 +479,7 @@ g14 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo V.O (n=500)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
@@ -318,7 +491,7 @@ g15 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo con Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo V.O (n=1000)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + v, donde v = β2x2 + u")
 
@@ -333,7 +506,7 @@ g16 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=50)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=50)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -345,7 +518,7 @@ g17 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=100)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=100)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -357,7 +530,7 @@ g18 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=500)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=500)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
@@ -369,11 +542,11 @@ g19 <- ggplot(betas_df2) +
                 
                 geom="line", colour="red", size=1) +
   
-  ylab("Densidad") +   ggtitle("Modelo sin Variable Omitida (n=1000)") + xlab(expression(hat(beta)[1])) +
+  ylab("Densidad") +   ggtitle("Modelo Pob (n=1000)") + xlab(expression(hat(beta)[1])) +
   
   theme_bw()+ labs(subtitle = "y = β0 + β1x1 + β2x2 + u")
 
-grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=2, ncol=4)
+grid.arrange(g12, g13, g14, g15, g16, g17, g18, g19, nrow=3, ncol=3)
 
 
 
